@@ -23,7 +23,7 @@ intents = json.loads(open('intents.json').read())
 lemmatizer = WordNetLemmatizer() # It is a technique use in nlp, basically convert a word to lemma i.e. the simmplest meaningful form of that word
 words = pickle.load(open('words.pkl','rb'))
 classes = pickle.load(open('classes.pkl','rb'))
-model = load_model('aibotmodelprof.h5')
+model = load_model('aibotmodelprofgood.h5')
 
 def room_func(msg,df):
     sentence_words = re.split(',|\s+|\.',msg)
