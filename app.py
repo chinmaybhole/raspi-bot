@@ -21,15 +21,23 @@ from tensorflow.keras.models import load_model
 from tensorflow.keras.layers import Dense,Activation,Dropout
 from tensorflow.keras.optimizers import SGD
 lemmatizer = WordNetLemmatizer()
+df=pd.read_csv("prof1.csv")
 
 app = Flask(__name__)
 
 intents = json.loads(open('intents.json').read())
+list_of_prof = ['Kavita', 'Naveeta', 'Rajani', 'Abhay', 'Asawari', 'Jaymala', 'Abhijit', 'Parmeshwar', 'Yogesh', 'Sarika', 'Rakhi', 'Gauri', 'Vijay', 'Amrita', 'Abhishek', 'Dipti', 'Anushree']
 # print(intents['intents'])
 lemmatizer = WordNetLemmatizer() # It is a technique use in nlp, basically convert a word to lemma i.e. the simmplest meaningful form of that word
 words = pickle.load(open('words.pkl','rb'))
 classes = pickle.load(open('classes.pkl','rb'))
-model = load_model('aibotmodelprof.h5')
+model = load_model('aibotmodelprof2.h5')
+
+
+def PROF_CSV(msg,df):
+    lab_no =[int(s) for s in msg.split() if s.isdigit()][0]
+    sentence=f"The professors sitting in lab no {lab_no} is {df[df['Room No']==lab_no]['Professors'].tolist()}"
+    return sentence
 
 def room_func(msg,df):
     sentence_words = re.split(',|\s+|\.',msg)
@@ -98,6 +106,7 @@ def timetable(div):
     div = div.upper()
    
     print(f"TimeTable of DIV {div}")
+    return f"static/timetable/{div}.jpg"
     # img = ImageTk.PhotoImage(Image.open(f'Timetable/{div}.jpg'))
     # Label(win,image = img).pack()
     # print("TimeTable")
@@ -118,14 +127,36 @@ def chatbot_response():
    
     if "Timetable".lower() in msg_lst:
         print("in timetable")
-        timetable(get_div(msg_lst,msg))
-        # render_template("old.html")
-        return "Your timetable is shown as"
+        res1=timetable(get_div(msg_lst,msg))
+        print(res1)
+        return res1
+    
+       
     else:
+        
         ints = predict_class(msg)
         res = get_response(ints, intents)
         print(res)
-        return res
+        if res=="Room_func":
+
+            room,flag = room_func(msg,df)
+            if flag==0:
+                message=f"Oops !! This professor name is not present in this department.\n Below is the list of Professors {[i for i in list_of_prof]}"
+                
+                return message
+           
+            else:
+
+                return room
+        elif res == "PROF_CSV":
+            ans=PROF_CSV(msg,df)
+            return ans
+        elif res=="clear":
+            return "static/images/white.jpg"
+
+        else:
+
+            return res
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5000,debug=True)

@@ -33,7 +33,7 @@
                 "Any time!",
                 "My pleasure!",
                 "No problem!",
-                "Thans does not ",
+               
                 "Glad to help!",
                 "No worries!",
                 "It was the least I could do!",
@@ -51,6 +51,19 @@
             "responses": [
                 "I'm in doubt about that",
                 "No, i don't think so I need to do all this"
+            ]
+        },
+
+        {
+            "tag": "clearing",
+            "patterns": [
+                "clear",
+                "clear screen",
+                "remove the timetable.","clrscr","cls"
+
+            ],
+            "responses": [
+                "clear"
             ]
         },
         {
@@ -130,7 +143,7 @@
         },
         {
             "tag": "List of Prof",
-            "patterns": ["Give me List of Professors", "Give me name of the professors", "list of Professors", "Show list of professors", "Display every professors in the department"],
+            "patterns": ["who is sitting in lab number 201", "who is sitting in lab number 203", "lab no 202", "who is sitting in lab no 203","who is sits in lab no 203", "Display every professors in the department","lab number 203"],
             "responses": ["PROF_CSV"]
         },
         {

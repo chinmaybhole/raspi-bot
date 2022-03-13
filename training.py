@@ -4,7 +4,7 @@ from pprint import pprint
 import pickle
 import json
 import numpy as np
-
+from sklearn.model_selection import train_test_split
 import nltk
 # nltk.download('omw-1.4')
 # nltk.download('punkt')
@@ -72,6 +72,8 @@ training= np.array(training)
 
 train_x = list(training[ : , 0])
 train_y = list(training[ : , 1])
+X_train, X_test, y_train, y_test = train_test_split(train_x, train_y, test_size=0.15, random_state=101)
+
 # print(train_y)
 # # Builing Model 
 act = 'relu'
@@ -91,9 +93,9 @@ adam = Adam(learning_rate=0.01)
 model.compile(loss = 'categorical_crossentropy',optimizer=adam,metrics=['accuracy'])
 # model.compile(loss = 'binary_crossentropy',optimizer=adam,metrics=['accuracy'])
 
-model.fit(np.array(train_x), np.array(train_y), epochs= 200,batch_size=4,verbose=1,callbacks=[stop],validation_split=0.15)
+model.fit(np.array(X_train), np.array(y_train), epochs= 200,batch_size=8,verbose=1,callbacks=[stop],validation_data=[np.array(X_test),np.array(y_test)])
 # print(model.evaluate(np.array(train_x), np.array(train_y)))
 # model.save('datazen1.h5')
-tf.saved_model.save(model, "aibotmodelprof3")
-# model.save('aibotmodelprof2.h5')
+# tf.saved_model.save(model, "aibotmodelprof2")
+model.save('aibotmodelprof2.h5')
 print('~~~~~ DONE ! ~~~~~~')
