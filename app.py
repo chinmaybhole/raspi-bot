@@ -1,3 +1,6 @@
+
+from flask import Flask, render_template, request
+from flask_ngrok import run_with_ngrok
 from copyreg import pickle
 from enum import EnumMeta
 import random
@@ -17,13 +20,16 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.models import load_model
 from tensorflow.keras.layers import Dense,Activation,Dropout
 from tensorflow.keras.optimizers import SGD
+lemmatizer = WordNetLemmatizer()
+
+app = Flask(__name__)
 
 intents = json.loads(open('intents.json').read())
 # print(intents['intents'])
 lemmatizer = WordNetLemmatizer() # It is a technique use in nlp, basically convert a word to lemma i.e. the simmplest meaningful form of that word
 words = pickle.load(open('words.pkl','rb'))
 classes = pickle.load(open('classes.pkl','rb'))
-model = load_model('aibotmodelprofgood.h5')
+model = load_model('aibotmodelprof.h5')
 
 def room_func(msg,df):
     sentence_words = re.split(',|\s+|\.',msg)
@@ -81,65 +87,45 @@ def get_response(intents_list,intents_json):
             # result = i['respones']
             break
     return result
-print("Go go bot")
 
-def chatbot_response(msg):
-    ints = predict_class(msg)
-    res = get_response(ints, intents)
-    return res
-def displaycsv():
-    df = pd.read_csv("prof1.csv")
-    return df
-df = pd.read_csv("prof.csv")
+def get_div(msg_lst,msg):
+    for i in msg_lst:
+        if i[0]== 'd':            
+            return i.upper()
+    
+
+def timetable(div):
+    div = div.upper()
+   
+    print(f"TimeTable of DIV {div}")
+    # img = ImageTk.PhotoImage(Image.open(f'Timetable/{div}.jpg'))
+    # Label(win,image = img).pack()
+    # print("TimeTable")
+    # win.mainloop()
+
+@app.route("/")
+def home():
+    return render_template("index.html")
+
+@app.route("/get", methods=["POST","GET"])
+
+def chatbot_response():
+    msg = request.form["msg"]
+    msg_lst=word_tokenize(msg)
+    msg_lst = [i.lower() for i in msg_lst]
+    
+   
+   
+    if "Timetable".lower() in msg_lst:
+        print("in timetable")
+        timetable(get_div(msg_lst,msg))
+        # render_template("old.html")
+        return "Your timetable is shown as"
+    else:
+        ints = predict_class(msg)
+        res = get_response(ints, intents)
+        print(res)
+        return res
+
 if __name__ == "__main__":
-    # print(predict_class('Hello'))
-    while True:
-        msg = input('You: ')
-        sentence_words = word_tokenize(msg)
-        sentence_words = [i.lower() for i in sentence_words]
-
-
-        print(sentence_words)
-        list_of_prof = ['Kavita', 'Naveeta', 'Rajani', 'Abhay', 'Asawari', 'Jaymala', 'Abhijit', 'Parmeshwar', 'Yogesh', 'Sarika', 'Rakhi', 'Gauri', 'Vijay', 'Amrita', 'Abhishek', 'Dipti', 'Anushree']
-        list_of_prof =  [i.lower() for i in list_of_prof]
-        # for i,prof in enumerate(list_of_prof):
-        #     if prof in sentence_words:
-        #         print(f'{prof.capitalize()} is in {df.iloc[i][-1]}')
-        if 'goodbye' in [x.lower() for x in sentence_words ] :
-            print('Bot: Bye')
-        else:
-            ints = predict_class(msg) 
-            # print(ints)
-            res = get_response(ints,intents)
-            if res == "PROF_CSV":
-                print(displaycsv())
-            else:
-                print('Bot: ',res)
-
-
-# a = ['Hello','Hi'
-# ,'Hello'
-# ,'Greetings!','Hello'
-# ,'Hello'
-# ,'Good'
-# ,'Fine'
-# ,'Okay'
-# ,'Great'
-# ,'Could be better.'
-# ,'Not so great.'
-# ,'Good.'
-# ,'Very well, thanks.'
-# ,'How are you doing?','Fine and you?'
-# ,'Nice to meet you.','Thank you.'
-# ,'Im doing well.'
-# ,'How do you do?',"I'm doing well. How are you?"
-# , 'nice to meet you.','Thank you. You too.'
-# ,'It is a pleasure to meet you.','Thank you. You too.'
-# ,'Top of the morning to you!','Thank you kindly.'
-# ,'Top of the morning to you!,And the rest of the day to you.'
-# ,'Whats up?', 'What about you?']
-
-
-# b = list(set(a))
-# b = json.dumps(b)
-# print(b)
+    app.run(host='0.0.0.0', port=5000)

@@ -1,3 +1,5 @@
+# Convert the model.
+import os
 from copyreg import pickle
 import random
 from pprint import pprint
@@ -72,28 +74,70 @@ training= np.array(training)
 
 train_x = list(training[ : , 0])
 train_y = list(training[ : , 1])
-# print(train_y)
-# # Builing Model 
-act = 'relu'
-stop = callbacks.EarlyStopping(monitor='val_loss',patience=5)
-model = Sequential()
-model.add(Dense(100,input_shape = (len(train_x[0]),),activation=act)) # input_shape parameter adds a layer before current layer as a input layer
-model.add(Dropout(0.15)) 
-model.add(Dense(100,activation=act))
-model.add(Dropout(0.15)) 
-model.add(Dense(50,activation=act))
-model.add(Dropout(0.15)) 
-model.add(Dense(25,activation=act))
-model.add(Dense(len(train_y[0]),activation='softmax')) # Output layer
-# model.add(Dense(len(train_y[0]),activation='sigmoid'))
-sgd = SGD(learning_rate=0.01,momentum=0.9,nesterov=True) # sgd optimiser is giving an error during predict operation ([nan nan])
-adam = Adam(learning_rate=0.01)
-model.compile(loss = 'categorical_crossentropy',optimizer=adam,metrics=['accuracy'])
-# model.compile(loss = 'binary_crossentropy',optimizer=adam,metrics=['accuracy'])
+model = tf.keras.models.load_model('aibotmodelprof2')
+##  converting model
+# converter = tf.lite.TFLiteConverter.from_keras_model(model)
+# tflite_model = converter.convert()
+# # Save the model.
+# with open('model.tflite', 'wb') as f:
+#   f.write(tflite_model)
 
-model.fit(np.array(train_x), np.array(train_y), epochs= 200,batch_size=4,verbose=1,callbacks=[stop],validation_split=0.15)
-# print(model.evaluate(np.array(train_x), np.array(train_y)))
-# model.save('datazen1.h5')
-tf.saved_model.save(model, "aibotmodelprof3")
-# model.save('aibotmodelprof2.h5')
-print('~~~~~ DONE ! ~~~~~~')
+
+def get_file_size(file_path):
+    size = os.path.getsize(file_path)
+    return size
+
+def convert_bytes(size, unit=None):
+    if unit == "KB":
+        return print('File size: ' + str(round(size / 1024, 3)) + ' Kilobytes')
+    elif unit == "MB":
+        return print('File size: ' + str(round(size / (1024 * 1024), 3)) + ' Megabytes')
+    else:
+        return print('File size: ' + str(size) + ' bytes')
+
+
+convert_bytes(get_file_size('aibotmodelprof.h5'), "KB")
+# test_loss,test_acc=model.evaluate(np.array(train_x), np.array(train_y))
+# print('/nTest accuracy:',test_acc)
+convert_bytes(get_file_size('model.tflite'), "KB")
+
+tflite_interpreter = tf.lite.Interpreter(model_path='model.tflite')
+
+input_details = tflite_interpreter.get_input_details()
+output_details = tflite_interpreter.get_output_details()
+
+print("== Input details ==")
+print("name:", input_details[0]['name'])
+print("shape:", input_details[0]['shape'])
+print("type:", input_details[0]['dtype'])
+
+print("\n== Output details ==")
+print("name:", output_details[0]['name'])
+print("shape:", output_details[0]['shape'])
+print("type:", output_details[0]['dtype'])
+print(input_details)
+
+
+
+print(np.array(train_x).shape)
+
+tflite_interpreter.resize_tensor_input(input_details[0]['index'], (119,192))
+tflite_interpreter.resize_tensor_input(output_details[0]['index'], (1,11))
+tflite_interpreter.allocate_tensors()
+
+input_details = tflite_interpreter.get_input_details()
+output_details = tflite_interpreter.get_output_details()
+tflite_interpreter.set_tensor(input_details[0]['index'],np.array(train_x,dtype=np.float32))
+
+tflite_interpreter.invoke()
+
+tflite_model_predictions = tflite_interpreter.get_tensor(output_details[0]['index'])
+print("Prediction results shape:", tflite_model_predictions.shape)
+## calculating tflite accuarcy 
+# tflite_interpreter.allocate_tensors()
+# tflite_interpreter.set_tensor(input_details[0]['index'],np.array(train_x,dtype=np.float32))
+# tflite_interpreter.invoke()
+
+
+# tflite_model_predictions = tflite_interpreter.get_tensor(output_details[0]['index'])
+# print("Prediction results shape:", tflite_model_predictions.shape)
