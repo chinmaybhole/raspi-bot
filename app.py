@@ -20,6 +20,13 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.models import load_model
 from tensorflow.keras.layers import Dense,Activation,Dropout
 from tensorflow.keras.optimizers import SGD
+import pyttsx3  
+
+engine = pyttsx3.init()  
+voices = engine. getProperty('voices')
+engine.setProperty("rate", 140)
+engine.setProperty('voice', voices[1].id)  
+
 lemmatizer = WordNetLemmatizer()
 
 app = Flask(__name__)
@@ -124,6 +131,8 @@ def chatbot_response():
     else:
         ints = predict_class(msg)
         res = get_response(ints, intents)
+        engine.say(response)   
+        engine.runAndWait()
         print(res)
         return res
 
