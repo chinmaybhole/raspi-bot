@@ -1,6 +1,6 @@
 
 from flask import Flask, render_template, request
-from flask_ngrok import run_with_ngrok
+# from flask_ngrok import run_with_ngrok
 from copyreg import pickle
 from enum import EnumMeta
 import random
