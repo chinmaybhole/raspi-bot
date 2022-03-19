@@ -11,12 +11,18 @@
     <div class="row">
         <div class="col-md-10 mr-auto ml-auto">
     <h1>VESBOT</h1>
+    <img  src="static\images\veslogo.png" height="100" width="100">    
+    
+    <!-- <img id="x" src="static\images\white.jpg" height="500" width="500"> -->
+    
     <form>
         <div id="chatbox">
             <div class="col-md-8 ml-auto mr-auto">
-                <p class="botText"><span>Hi! I'm Your bot.</span></p>
+                <p class="botText"><span>VESBOT : Hello! VESBOT at your service.</span></p>
             </div>
         </div>
+        
+       
         <div id="userInput" class="row">
             <div class="col-md-10">
                 <input id="text" type="text" name="msg" placeholder="Message" class="form-control">
@@ -26,12 +32,13 @@
     </form>
 </div>
 </div>
+<img id="x" src="static\images\white.jpg" height="500" width="500">
 
 <script>
     $(document).ready(function() {
         $("form").on("submit", function(event) {
             var rawText = $("#text").val();
-            var userHtml = '<p class="userText"><span>' + rawText + "</span></p>";
+            var userHtml = '<p class="userText"><span>YOU : ' + rawText + "</span></p>";
             $("#text").val("");
             $("#chatbox").append(userHtml);
             document.getElementById("userInput").scrollIntoView({
@@ -45,13 +52,45 @@
                 type: "POST",
                 url: "/get",
             }).done(function(data) {
-                var botHtml = '<p class="botText"><span>' + data + "</span></p>";
+                var regEx = /^[0-9a-zA-Z/.]+$/;
+                
+                // window.alert(data.match(regEx));
+                if (data.match(regEx)){
+                    var newimg=data;
+                    // window.alert(data);
+                    function ReplacingImage(newimg){ 
+ 
+                    document.getElementById("x").src=newimg;
+                    }
+                    ReplacingImage(newimg)
+
+
+                //     var botHtml = '<p class="botText"><span>' + "Your timetable is shown below" + "</span></p>";
+                // $("#chatbox").append($.parseHTML(botHtml));
+                // document.getElementById("userInput").scrollIntoView({
+                //     block: "start",
+                //     behavior: "smooth",
+                // });
+            
+            
+                }
+                else{
+                
+                var botHtml = '<p class="botText"><span>VESBOT : ' + data + "</span></p>";
                 $("#chatbox").append($.parseHTML(botHtml));
                 document.getElementById("userInput").scrollIntoView({
                     block: "start",
                     behavior: "smooth",
                 });
-            });
+                }
+            // var botHtml = '<p class="botText"><span>' + "123" + "</span></p>";
+            //     $("#chatbox").append($.parseHTML(botHtml));
+            //     document.getElementById("userInput").scrollIntoView({
+            //         block: "start",
+            //         behavior: "smooth",
+            //     });
+            // });
+        });
             event.preventDefault();
         });
     });
