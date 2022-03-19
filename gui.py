@@ -1,11 +1,14 @@
 #Creating GUI with tkinter
 import tkinter
+#import pyttsx3  
 from tkinter import *
 from bot import chatbot_response,displaycsv,room_func
 from PIL import ImageTk, Image
 from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
 lemmatizer = WordNetLemmatizer()
+# engine = pyttsx3.init()  
+# voices = engine. getProperty('voices')
 
 def get_div(msg_lst,msg):
     for i in msg_lst:
@@ -79,7 +82,10 @@ def send():
         else:
             ChatLog.insert(END, "Bot: " + res + '\n\n')
             # print("ABRACADABRA")
-
+            # engine.setProperty("rate", 140)
+            # engine.setProperty('voice', voices[1].id)   
+            # engine.say(res)   
+            # engine.runAndWait()
 
         ChatLog.config(state=DISABLED)
         ChatLog.yview(END)

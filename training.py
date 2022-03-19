@@ -6,7 +6,9 @@ import json
 import numpy as np
 
 import nltk
-# nltk.download('omw-1.4')
+#ltk.download('omw-1.4')
+#nltk.download('punkt')
+#nltk.download('wordnet')
 from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
 
@@ -15,7 +17,7 @@ from tensorflow.keras.layers import Dense,Activation,Dropout
 from tensorflow.keras.optimizers import SGD,Adam
 from tensorflow.keras import callbacks
 
-intents = json.loads(open('C:/Users/91703/Desktop/projects/Enquiry-Chatbot/intents.json').read())
+intents = json.loads(open('intents.json').read())
 # print(intents['intents'])
 
 lemmatizer = WordNetLemmatizer() # It is a technique use in nlp, basically convert a word to lemma i.e. the simmplest meaningful form of that word
