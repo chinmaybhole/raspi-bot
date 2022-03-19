@@ -143,7 +143,7 @@ def chatbot_response():
         
         ints = predict_class(msg)
         res = get_response(ints, intents)
-        engine.say(response)   
+        engine.say(res)   
         engine.runAndWait()
         print(res)
         if res=="Room_func":
